@@ -5,8 +5,6 @@ import { useRouter } from "next/navigation";
 import { Doc } from "@/types/document";
 
 export default function NewDocument() {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
   const [documents, setDocuments] = useState<Doc[]>([]);
   const router = useRouter();
 
@@ -21,44 +19,46 @@ export default function NewDocument() {
   };
 
   const handleCreateDocument = async () => {
-    const response = await fetch("http://localhost:8080/api/document/save", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ title, content }),
-    });
+    const defaultTitle = "Untitled Document";
+    const defaultContent = "";
 
-    if (response.ok) {
-      const newDocument = await response.json();
-      // Optionally redirect or show success
-      router.push(`/edit/${newDocument.id}`); // Redirect to the edit page
-    } else {
-      alert("Failed to create document");
+    try {
+      const response = await fetch("http://localhost:8080/api/document/save", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ title: defaultTitle, content: defaultContent }),
+      });
+
+      if (response.ok) {
+        const newDocument = await response.json().catch(() => null);
+
+        if (newDocument && newDocument.id) {
+          router.push(`/document/${newDocument.id}`); // Redirect to the edit page
+        } else {
+          console.error("Unexpected response format:", newDocument);
+          alert("Failed to create document: Invalid response format");
+        }
+      } else {
+        console.error("Server error:", response.statusText);
+        alert("Failed to create document");
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+      alert("Failed to create document due to a network error");
     }
   };
 
   return (
     <div>
-      <h1>Create New Document</h1>
-      <input
-        type='text'
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder='Document Title'
-      />
-      <textarea
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        placeholder='Start writing here...'
-      />
       <button onClick={handleCreateDocument}>Create Document</button>
 
       <h2>Existing Documents</h2>
       <ul>
-        {documents.map((doc) => (
+        {documents?.map((doc) => (
           <li key={doc.id}>
-            <a href={`/edit/${doc.id}`}>{doc.title}</a>
+            <a href={`/document/${doc.id}`}>{doc.title}</a>
           </li>
         ))}
       </ul>

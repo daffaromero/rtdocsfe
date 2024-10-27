@@ -15,14 +15,22 @@ export default function DocPage() {
     ws.onclose = () => console.log("Disconnected from WebSocket server");
 
     ws.onmessage = (event) => {
-      const update = JSON.parse(event.data);
-      if (update.type === "init") {
-        setTitle(update.title);
-        setContent(update.content);
-      } else if (update.type === "title") {
-        setTitle(update.data);
-      } else if (update.type === "content") {
-        setContent(update.data);
+      try {
+        if (event.data) {
+          const update = JSON.parse(event.data);
+          if (update.type === "init") {
+            setTitle(update.title);
+            setContent(update.content);
+          } else if (update.type === "title") {
+            setTitle(update.data);
+          } else if (update.type === "content") {
+            setContent(update.data);
+          }
+        } else {
+          console.warn("Received empty WebSocket message");
+        }
+      } catch (error) {
+        console.error("Failed to parse WebSocket message:", error);
       }
     };
 
