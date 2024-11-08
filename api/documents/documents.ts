@@ -11,15 +11,22 @@ export const getDocument = async (id: string) => {
 };
 
 export const createDocument = async () => {
+  const documentID = "";
+  const accountID = localStorage.getItem("user_id");
   const defaultTitle = "Untitled Document";
   const defaultContent = "";
 
-  const response = await fetch("http://localhost:8080/api/document/save", {
+  const response = await fetch("http://localhost:8080/api/document/create", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ title: defaultTitle, content: defaultContent }),
+    body: JSON.stringify({
+      id: documentID,
+      title: defaultTitle,
+      content: defaultContent,
+      owner_id: accountID,
+    }),
   });
 
   if (response.ok) {
@@ -33,7 +40,7 @@ export const createDocument = async () => {
   } else {
     throw new Error("Failed to create document");
   }
-}
+};
 
 export const saveDocument = async (title: string, content: string) => {
   const response = await fetch("http://localhost:8080/api/document/save", {
@@ -41,6 +48,7 @@ export const saveDocument = async (title: string, content: string) => {
     headers: {
       "Content-Type": "application/json",
     },
+
     body: JSON.stringify({ title, content }),
   });
 

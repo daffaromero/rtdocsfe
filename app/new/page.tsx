@@ -2,17 +2,25 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Doc } from "@/types/document";
+import { Doc } from "@/types";
 import { createDocument, getDocuments } from "@/api/documents/documents";
+import { checkAuth, createGuestAccount } from "@/api/auth";
 
 export default function NewDocument() {
   const [documents, setDocuments] = useState<Doc[]>([]);
   const router = useRouter();
   useEffect(() => {
-    getDocuments().then((docs) => {
+    const initialize = async () => {
+      let isAuthenticated = await checkAuth();
+      if (!isAuthenticated) {
+        await createGuestAccount();
+      }
+      const docs = await getDocuments();
       setDocuments(docs);
-    });
-  }, [documents]);
+    };
+
+    initialize();
+  }, []);
 
   return (
     <div>
