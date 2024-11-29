@@ -7,16 +7,15 @@ export const getDocuments = async () => {
 };
 
 export const getDocument = async (id: string) => {
-  const response = await fetch(`http://localhost:8080/api/document/${id}`);
+  const reqURL = `http://localhost:8080/api/document/${id}`;
+  const response = await fetch(reqURL);
   const data = await response.json();
   return data;
 };
 
 export const createDocument = async () => {
   const token = localStorage.getItem("token");
-  console.log(token);
   const accountID = parseJwt(token || "").user_id;
-  console.log(accountID);
   const defaultTitle = "Untitled Document";
   const defaultContent = "";
   const requestBody = JSON.stringify({
@@ -24,7 +23,6 @@ export const createDocument = async () => {
     content: defaultContent,
     owner_id: accountID,
   });
-  console.log(requestBody);
   const response = await fetch("http://localhost:8080/api/document/create", {
     method: "POST",
     headers: {
@@ -45,14 +43,26 @@ export const createDocument = async () => {
   }
 };
 
-export const saveDocument = async (title: string, content: string) => {
+export const saveDocument = async (
+  id: string,
+  title: string,
+  content: string
+) => {
+  const token = localStorage.getItem("token");
+  const accountID = parseJwt(token || "").user_id;
+  const requestBody = JSON.stringify({
+    id: id,
+    title: title,
+    content: content,
+    owner_id: accountID,
+  });
   const response = await fetch("http://localhost:8080/api/document/save", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
 
-    body: JSON.stringify({ title, content }),
+    body: requestBody,
   });
 
   if (response.ok) {

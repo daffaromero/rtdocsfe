@@ -7,7 +7,6 @@ export async function checkAuth(): Promise<boolean> {
 export async function createGuestAccount(): Promise<void> {
   let token = localStorage.getItem("token");
   if (token) {
-    console.log("WE GOT A LIVE ONE");
     return;
   }
   // Create a guest account by sending a POST request to the server

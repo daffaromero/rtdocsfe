@@ -26,7 +26,9 @@ export default function DocPage() {
   }, [pathname]);
 
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:8080/ws");
+    const ws = new WebSocket(
+      `ws://localhost:8080/ws/${pathname.split("/")[2]}`
+    );
     wsRef.current = ws;
 
     ws.onopen = () => console.log("Connected to WebSocket server");
@@ -82,9 +84,11 @@ export default function DocPage() {
             variant='default'
             className='mr-2'
             onClick={() => {
-              saveDocument(title, content).then((doc) => {
-                router.push(`/document/${doc.id}`);
-              });
+              saveDocument(pathname.split("/")[2], title, content).then(
+                (doc) => {
+                  router.push(`/document/${doc.id}`);
+                }
+              );
             }}
           >
             Save
