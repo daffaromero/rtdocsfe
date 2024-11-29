@@ -11,6 +11,7 @@ export default function NewDocument() {
   const router = useRouter();
   useEffect(() => {
     const initialize = async () => {
+      console.log("Initializing");
       let isAuthenticated = await checkAuth();
       if (!isAuthenticated) {
         await createGuestAccount();

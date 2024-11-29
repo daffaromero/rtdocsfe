@@ -7,27 +7,24 @@ export async function checkAuth(): Promise<boolean> {
 export async function createGuestAccount(): Promise<void> {
   let token = localStorage.getItem("token");
   if (token) {
+    console.log("WE GOT A LIVE ONE");
     return;
   }
   // Create a guest account by sending a POST request to the server
-  const response = await fetch("http://localhost:8080/api/auth/guest", {
+  await fetch("http://localhost:8080/api/auth/guest", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
   })
-    .then((response) => {
+    .then(async (response) => {
       if (response.ok) {
         // Get the token from the response headers
-        const authHeader = response.headers.get("Authorization");
-        if (authHeader) {
-          token = authHeader.split(" ")[1];
-        } else {
-          console.error("Authorization header is missing");
-        }
+        const data = await response.json();
+        const authToken = data.token;
         // Save the token in localStorage
-        if (token) {
-          localStorage.setItem("token", token);
+        if (authToken) {
+          localStorage.setItem("token", authToken);
         } else {
           console.error("Token is null");
         }
